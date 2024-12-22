@@ -3,30 +3,34 @@
 // hexbuff[ | | | | | | | | | | | | | | | ]
 
 #include <unistd.h>
-#include <stdio.h>
 
-char *get_mem_hex(intptr_t ptr, char *hexMap, char *hexBuff){
+size_t print_mem_hex(intptr_t ptr, char *hexMap, size_t hezSz){
 	if (ptr/16)
-		hexBuff = get_mem_hex(ptr/16, hexMap, hexBuff-1);
-	*hexBuff = hexMap[ptr%16];
-	return (hexBuff+1);
+		hezSz = print_mem_hex(ptr/16, hexMap, hezSz+1);
+	if(hezSz != 0)
+	{
+		write(1,"0000000000000000",16 - hezSz);
+		hezSz=0;
+	}
+	write(1, &hexMap[ptr%16],1);
+	return hezSz;
 }
-
-void *ft_print_memory(void *addr, unsigned int size){
+void *ft_print_memory(void *addr){
 	char hexMap[]= "0123456789abcdef";
-	char hexBuff[17];
-
 	intptr_t intaddr = (intptr_t)addr; 
-	get_mem_hex(intaddr, hexMap, hexBuff+15);
-	size_t i = 0;
 
-	while(!hexBuff[i])
-		hexBuff[i++] = '0';
-	hexBuff[15] = 0;
+
+	print_mem_hex(intaddr, hexMap, 0);
+
+	write(1,"\n",1);
 
 	return addr;
 }
+
 int main(void){
+	char c= 'c';
+	void *addr = &c;
+	ft_print_memory(addr);
 }
 
 // int main(){
